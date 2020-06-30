@@ -1,21 +1,25 @@
 import { expect } from 'chai';
+import app from './index.js';
+import request from 'supertest';
 import { spy } from 'sinon';
 
-import sayHello from './index.js';
 
-describe('sayHello', () => {
-  // simple test of the basic functionality
-  it('should say "Hello World"', () => {
-    expect(sayHello()).to.eql('Hello World');
-  })
-  // using spies to ensure the function has been called and is returning the correct thing
-  it('should call the function', () => {
-    const helloSpy = spy(sayHello);
+describe('app', () => {
+  it('should create an app', () => {
+    expect(app).to.be.an("function");
+    expect(request(app)).to.be.an("Object");
+  });
 
-    helloSpy(sayHello);
-
-    expect(helloSpy.called).to.be.eql(true);
-    expect(helloSpy.returnValues[0]).to.be.eql('Hello World');
-
+  it('should return "Hello World"', () => {
+    const helloSpy = spy(request(app));
+    return helloSpy
+      .get('/')
+      .expect(200)
+      .then(res => {
+        console.log(res.body.message)
+        expect(res.body).to.be.an("object");
+        expect(helloSpy.called).to.be.eql(true);
+        expect(res.body.message).to.eql("Hello World");
+      })
   })
 });
